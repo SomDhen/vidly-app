@@ -529,9 +529,115 @@
 // export default LoginForm;
 
 // Extracting Helper Rendering Methods
+// import React from "react";
+// import Joi from "joi-browser";
+// import Form from "./common/form";
+// import { login } from "../services/authService";
+
+// class LoginForm extends Form {
+//   state = {
+//     data: { username: "", password: "" },
+//     errors: {},
+//   };
+
+//   schema = {
+//     username: Joi.string().required().label("Username"),
+//     password: Joi.string().required().label("Password"),
+//   };
+
+//   doSubmit = async () => {
+//     // Call the Server
+//     // console.log("Submitted");
+
+//     try {
+//       const { data } = this.state;
+//       const { data: jwt } = await login(data.username, data.password);
+//       localStorage.setItem("token", jwt);
+//       this.props.history.push("/");
+//     } catch (ex) {
+//       if (ex.response && ex.response.status === 400) {
+//         const errors = { ...this.state.errors };
+//         errors.username = ex.response.data;
+//         this.setState({ errors });
+//       }
+//     }
+//   };
+
+//   render() {
+//     return (
+//       <div>
+//         <h2>Login Form</h2>
+//         <form onSubmit={this.handleSubmit}>
+//           {this.renderInput("username", "Username")}
+//           {this.renderInput("password", "Password", "password")}
+//           {this.renderButton("Login")}
+//         </form>
+//       </div>
+//     );
+//   }
+// }
+
+// export default LoginForm;
+
+// Displaying the Current User on NavBar
+// import React from "react";
+// import Joi from "joi-browser";
+// import Form from "./common/form";
+// import { login } from "../services/authService";
+
+// class LoginForm extends Form {
+//   state = {
+//     data: { username: "", password: "" },
+//     errors: {},
+//   };
+
+//   schema = {
+//     username: Joi.string().required().label("Username"),
+//     password: Joi.string().required().label("Password"),
+//   };
+
+//   doSubmit = async () => {
+//     // Call the Server
+//     // console.log("Submitted");
+
+//     try {
+//       const { data } = this.state;
+//       const { data: jwt } = await login(data.username, data.password);
+//       localStorage.setItem("token", jwt);
+//       // this.props.history.push("/");
+//       window.location = "/";
+//     } catch (ex) {
+//       if (ex.response && ex.response.status === 400) {
+//         const errors = { ...this.state.errors };
+//         errors.username = ex.response.data;
+//         this.setState({ errors });
+//       }
+//     }
+//   };
+
+//   render() {
+//     return (
+//       <div>
+//         <h2>Login Form</h2>
+//         <form onSubmit={this.handleSubmit}>
+//           {this.renderInput("username", "Username")}
+//           {this.renderInput("password", "Password", "password")}
+//           {this.renderButton("Login")}
+//         </form>
+//       </div>
+//     );
+//   }
+// }
+
+// export default LoginForm;
+
+// Refactoring (Authentication, Token Key)
 import React from "react";
+import { Redirect } from "react-router-dom";
 import Joi from "joi-browser";
 import Form from "./common/form";
+// import { login } from "../services/authService";
+import auth from "../services/authService";
 
 class LoginForm extends Form {
   state = {
@@ -544,12 +650,27 @@ class LoginForm extends Form {
     password: Joi.string().required().label("Password"),
   };
 
-  doSubmit = () => {
+  doSubmit = async () => {
     // Call the Server
-    console.log("Submitted");
+    // console.log("Submitted");
+
+    try {
+      const { data } = this.state;
+      await auth.login(data.username, data.password);
+
+      const { state } = this.props.location;
+      window.location = state ? state.from.pathname : "/";
+    } catch (ex) {
+      if (ex.response && ex.response.status === 400) {
+        const errors = { ...this.state.errors };
+        errors.username = ex.response.data;
+        this.setState({ errors });
+      }
+    }
   };
 
   render() {
+    if (auth.getCurrentUser()) return <Redirect to="/" />;
     return (
       <div>
         <h2>Login Form</h2>
