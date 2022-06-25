@@ -15,6 +15,9 @@ import { BrowserRouter as Router } from "react-router-dom";
 //   document.getElementById("root")
 // );
 
+// console.log(process.env);
+console.log("SUPERMAN", process.env.REACT_APP_NAME);
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <Router>
